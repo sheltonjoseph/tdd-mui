@@ -8,9 +8,9 @@ const TodoList = ({ todos, setTodos }) => {
       {todos.map((todo, index) => (
         <TaskCard
           index={index}
-          todos={todos}
+          // todos={todos}
           todo={todo}
-          key={todo.id}
+          key={todo.todo_id}
           setTodos={setTodos}
         />
       ))}
