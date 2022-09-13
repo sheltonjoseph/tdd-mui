@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputBase from "@mui/material/InputBase";
 import Button from "@mui/material/Button";
 import AddTaskIcon from "@mui/icons-material/AddTask";
@@ -8,18 +8,41 @@ import TodoList from "../Components/TaskList/TaskList";
 
 
 
-
-
 const Home = () => {
-    const [todo, setTodo] = useState("");
-    const [todos, setTodos] = useState([]);
-    const handleAdd = () => {
-        // e.preventDefault();
-      
-          setTodos([...todos, { id: Date.now(), todo, isDone: false }]);
-          setTodo("");
-        
-      };
+  const [description, setDescription] = useState("");
+  const [todos, setTodos] = useState([]);
+
+ const getTodos = async () =>{
+  try{
+    const getResponse = await fetch("http://localhost:5000/todos")
+    const jsonData = await getResponse.json()
+    setTodos(jsonData)
+  }catch(err){
+    console.log(err.message)
+  }
+ }
+
+ useEffect(()=>{
+  getTodos()
+ },[todos])
+
+ const onSubmitForm = async (e) => {
+  e.preventDefault();
+  try {
+    const body = { description };
+    const response = await fetch("http://localhost:5000/todos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    setDescription("");
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+
+
   return (
     <div className="App">
       <Typography
@@ -29,7 +52,7 @@ const Home = () => {
           color: "white",
           zIndex: 1,
           textAlign: "center",
-        //   fontFamily: "Neucha" "cursive"
+          //   fontFamily: "Neucha" "cursive"
         }}
         data-testid="heading"
       >
@@ -49,8 +72,8 @@ const Home = () => {
         <InputBase
           sx={{ ml: 1, flex: 1 }}
           placeholder="Enter The task"
-          value={todo}
-          onChange={(e) => setTodo(e.target.value)}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           data-testid="nameInput"
           inputProps={{ "data-testid": "textInput" }}
         />
@@ -62,13 +85,13 @@ const Home = () => {
             justifyContent: "center",
             borderRadius: "20px",
           }}
-          disabled={!todo}
+          disabled={!description}
           endIcon={<AddTaskIcon />}
-          onClick={handleAdd}
+          onClick={onSubmitForm}
           data-testid="button"
         />
       </div>
-      <TodoList todos={todos}  setTodos={setTodos}/>
+      <TodoList todos={todos} setTodos={setTodos} />
     </div>
   );
 };
