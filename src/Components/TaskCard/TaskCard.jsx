@@ -7,31 +7,29 @@ import ButtonGroup from "@mui/material/ButtonGroup";
 import EditTask from "./EditTask";
 
 
-const TaskCard = ({ todo, setTodos, todos }) => {
-  // const handleClick = (id) => {
-  //   setTodos(
-  //     todos.map((todo) =>
-  //       todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-  //     )
-  //   );
-  // };
+const TaskCard = ({ todo, setTodos, todos , setIsGetTodos , deleteTodo }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleDoneClick = async (id) => {
+    try{
+      const body = { isdone : !todo.isdone };
+      const response = await fetch(`http://localhost:5000/todos/${id}`,{
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        })
+        setIsGetTodos(true)
+    }catch (err) {
+      console.error(err.message);
+    }
+  };
 
   // delete function
-  const [anchorEl, setAnchorEl] = useState(null);
+  console.log(todo)
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  
-  const deleteTodo = async (id) => {
-    try {
-      const deleteTodo = await fetch(`http://localhost:5000/todos/${id}`, {
-        method: "DELETE",
-      });
-      setTodos(todos.filter(todo => todo.todo_id !== id))
-    } catch (err) {
-      console.log(err.message);
-    }
-  };
+
   return (
     <Card sx={{ minWidth: 275, m: 5 }} data-testid="card">
       <CardContent
@@ -44,7 +42,7 @@ const TaskCard = ({ todo, setTodos, todos }) => {
         <Typography
           sx={{
             fontSize: 14,
-            textDecoration: todo.isDone ? "line-through" : "none",
+            textDecoration: todo.isdone ? "line-through" : "none",
           }}
           color="text.secondary"
           gutterBottom
@@ -56,8 +54,10 @@ const TaskCard = ({ todo, setTodos, todos }) => {
         <ButtonGroup
           variant="contained"
           aria-label="outlined primary button group"
+          sx={{ml:2}}
         >
-          <Button onClick={handleClick} >Edit</Button>
+          <Button onClick={() => handleDoneClick(todo.todo_id)} >done</Button>
+          {/* <Button onClick={handleClick} >Edit</Button> */}
           <Button onClick={() => deleteTodo(todo.todo_id)}>Delete</Button>
         </ButtonGroup>
       </CardContent>
